@@ -140,3 +140,43 @@ use your own buy signal. To do so, extend the `ScalpAlgo` class and write your o
 ```
 
 And use it instead of the original class.
+
+
+## Risk Controls (Added)
+
+This fork adds a **risk management overlay** (see `risk.py`) that gates entries and can forcibly liquidate positions if risk thresholds are breached.
+
+### What it does
+
+**Portfolio-level**
+- **Max concurrent positions** (`--max-positions`)
+- **Max position notional** per new entry (`--max-position-notional`)
+- **Max total exposure** across positions + pending buys (`--max-total-exposure`)
+- **Daily loss kill-switch** based on account equity drawdown from script start (`--max-daily-loss`)
+
+**Per-position**
+- **Stop-loss** vs entry price (`--stop-loss-pct`)
+- **Time-stop** (max holding time) (`--time-stop-minutes`)
+
+**Market condition guardrails (entry gating)**
+- **Spread guard** via last quote (`--max-spread-bps` / `--max-spread-cents`)
+- **Volatility guard** using 1-min bars (`--max-bar-range-pct`, `--max-return-std-pct`)
+
+**Circuit breaker**
+- Disable a symbol after repeated forced exits (`--symbol-max-forced-exits`) with an optional cooldown (`--forced-exit-cooldown-minutes`).
+
+### Example usage
+
+```sh
+# Conservative defaults for an example account
+python main.py --lot=2000 --max-positions=3 --max-daily-loss=100 TSLA AAPL
+
+# Tighter per-position risk controls
+python main.py --lot=2000 --stop-loss-pct=0.002 --time-stop-minutes=5 TSLA AAPL
+```
+
+### Notes / caveats
+
+- Kill-switch uses **account equity** drawdown from the moment the script starts. If the script restarts mid-day, the baseline resets.
+- Spread guard requires quote availability from your market data subscription. If quotes are unavailable, the spread guard is skipped (the script continues to operate).
+- This is still an educational example; do not treat these defaults as production-safe without thorough testing.
