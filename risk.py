@@ -620,3 +620,4 @@ class RiskManager(object):
     def realized_pnl_symbol(self, symbol):
         return float(self._realized_pnl_by_symbol.get(symbol, 0.0))
 
+
