@@ -180,3 +180,25 @@ python main.py --lot=2000 --stop-loss-pct=0.002 --time-stop-minutes=5 TSLA AAPL
 - Kill-switch uses **account equity** drawdown from the moment the script starts. If the script restarts mid-day, the baseline resets.
 - Spread guard requires quote availability from your market data subscription. If quotes are unavailable, the spread guard is skipped (the script continues to operate).
 - This is still an educational example; do not treat these defaults as production-safe without thorough testing.
+
+## Research & Replay (Step 1: Contract)
+
+This repo is being extended with a **research + replay** pathway to evaluate the strategy on historical data with realistic friction and walk-forward validation.
+
+**Step 1 (this commit) only defines the contract.** No replay engine, fill simulator, or metric pipeline is included yet.
+
+### Contract files
+
+- `replay/CONTRACT.md` — human-readable specification of the research/replay boundary and semantics.
+- `replay/contracts.py` — Python (stdlib-only) interface definitions and value objects:
+  - market data (`Bar`, `Quote`, `Trade`)
+  - broker objects (`Order`, `Position`, `Account`)
+  - API surface (`BrokerAPI`) matching the subset used by `main.py` and `risk.py`
+  - configuration knobs (`ReplayParams`) for spread/fees/partial fills/latency
+
+### What will be implemented next (not in Step 1)
+
+- Historical replay loop with realistic costs (spread, fees, partial fills)
+- Walk-forward + out-of-sample evaluation
+- Metrics: expectancy, hit rate, avg win/loss, tail risk, time-in-trade
+
