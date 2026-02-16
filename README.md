@@ -202,3 +202,21 @@ This repo is being extended with a **research + replay** pathway to evaluate the
 - Walk-forward + out-of-sample evaluation
 - Metrics: expectancy, hit rate, avg win/loss, tail risk, time-in-trade
 
+
+## Research & replay scaffolding (Steps 1–2)
+
+This repository includes early-stage scaffolding to support a **research + replay loop**
+using historical data with realistic costs (spread, fees, partial fills), and later
+walk-forward evaluation.
+
+Current state:
+- **Step 1:** Contracts only (`replay/CONTRACT.md`, `replay/contracts.py`)
+- **Step 2:** Minimal refactor + research module scaffolding:
+  - `algo.py` contains `ScalpAlgo` (extracted from `main.py`)
+  - `replay/` contains data/broker/simulated API scaffolding
+  - `research.py` and `walkforward.py` provide CLI/windowing scaffolds
+
+Important:
+- The actual replay engine and walk-forward execution are **not implemented** until Step 3+.
+  Step 2 is intentionally about establishing stable module boundaries and compatibility.
+
