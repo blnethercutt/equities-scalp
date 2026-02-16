@@ -125,7 +125,7 @@ class Order(object):
     - side
     - qty
     - limit_price (optional)
-    - submitted_at (timezone-aware datetime)
+    - submitted_at (timezone-aware timestamp; pandas Timestamp preferred)
 
     and sometimes reads filled fields on the *order update payload*:
     - filled_qty
@@ -159,7 +159,7 @@ class Order(object):
         qty: float,
         limit_price: Optional[float],
         status: str,
-        submitted_at: _dt.datetime,
+        submitted_at: Any,
         filled_qty: float = 0.0,
         filled_avg_price: Optional[float] = None,
     ) -> None:
@@ -323,8 +323,17 @@ class BrokerDataAPI(abc.ABC):
         """Fetch an order by id."""
 
     @abc.abstractmethod
-    def list_orders(self) -> Sequence[Order]:
+    def list_orders(self, **kwargs: Any) -> Sequence[Order]:
         """List current open orders (or all recent orders depending on implementation)."""
+    def cancel_all_orders(self, **kwargs: Any) -> None:
+        """Cancel all open orders (best-effort).
+
+        Live Alpaca clients may not expose this helper; `RiskManager` falls back to
+        `list_orders(status="open")` + per-order cancel when not present.
+        Implementations that support batch cancel SHOULD override this method.
+        """
+        raise NotImplementedError
+
 
     # ----- Portfolio / account -----
 
@@ -361,3 +370,4 @@ When implementing the replay engine (later steps), ensure:
 
 4) Maintain timezone awareness. Use UTC internally and convert only at boundaries.
 """
+
